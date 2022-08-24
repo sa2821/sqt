@@ -26,6 +26,8 @@ const Tetris = Object.create(null);
  * @property {Tetris.Tetromino} next_tetromino The next piece to descend.
  * @property {number[]} position Where in the field is the current tetromino.
  * @property {Tetris.Score} score Information relating to the score of the game.
+ * @property {Tetris.Tetromino} hold_tetromino The tetromino being held.
+ * @property {boolean} can_hold Whether the piece can be held.
  */
 
 /**
@@ -258,6 +260,7 @@ Tetris.field_width = 10;
 
 const starting_position = [Math.floor(Tetris.field_width / 2) - 1, 0];
 
+
 //----------------------------------------------------------------------------//
 // ## Methods                                                                 //
 //----------------------------------------------------------------------------//
@@ -305,7 +308,9 @@ Tetris.new_game = function () {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": new_score()
+        "score": new_score(),
+        "hold_tetromino": false,
+        "can_hold": true //tetromino can be held again, resets
     };
 };
 
@@ -564,6 +569,12 @@ const clear_lines = R.pipe(
  * @returns {Tetris.Game}
  */
 Tetris.next_turn = function (game) {
+
+    var canHold = game.can_hold; // otherwise doesn't allow to hold
+    if (canHold == false) {
+        canHold = true;
+    }
+
     if (game.game_over) {
         return game;
     }
@@ -594,7 +605,9 @@ Tetris.next_turn = function (game) {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": game.score
+        "score": game.score,
+        "hold_tetromino": game.hold_tetromino,
+        "can_hold": canHold
     };
 };
 
@@ -607,5 +620,52 @@ Tetris.next_turn = function (game) {
 Tetris.is_game_over = function (game) {
     return game.game_over;
 };
+
+/**
+ * @function
+ * @memberof Tetris
+ * @param {Tetris.game} game The game to check is over or in play.
+ * @returns {Tetris.game} Whether the game is over or not.
+ * @returns {Tetris.tetromino}
+ */
+
+Tetris.hold = function(game) {
+    game = R.clone(game);
+    if (game.can_hold == true) {
+        game.can_hold = false;
+
+        // if there's no hold tetromino yet
+        // 1. current tetromino becomes next tetromino
+        // 2. hold tetromino becomes current tetromino
+        // 3. next tetromino becomes next tetromino of next turn
+        if (game.hold_tetromino == false) {
+            //const [next_tetromino, bag] = game.bag();
+            game.current_tetromino = game.next_tetromino;
+            game.hold_tetromino = game.current_tetromino;
+            game.next_tetromino = Tetris.next_turn(game).next_tetromino;
+            //game.bag = bag;
+            // start from the top again
+            game.position = starting_position;
+        }
+
+        // if there is a hold tetromino already
+        // 1. current tetromino becomes hold tetromino
+        // 2. hold tetromino becomes current tetromino
+        // 3. next tetromino becomes next tetromino of next turn
+        else {
+            const held_tetromino = game.hold_tetromino; //otherwise always lets hold
+            game.current_tetromino = held_tetromino;
+            game.hold_tetromino = game.current_tetromino;
+            game.next_tetromino = Tetris.next_turn(game).next_tetromino;
+            game.position = starting_position;
+        }
+        return game;
+    } else {
+        return game;
+    }
+};
+
+
+
 
 export default Object.freeze(Tetris);

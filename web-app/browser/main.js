@@ -3,12 +3,26 @@ import Tetris from "../common/Tetris.js";
 const grid_columns = Tetris.field_width;
 const grid_rows = Tetris.field_height;
 
+const next_grid_rows = 6;
+const next_grid_columns = 6;
+const hold_grid_rows = 6;
+const hold_grid_columns = 6;
+
+
 let game = Tetris.new_game();
 
 document.documentElement.style.setProperty("--grid-rows", grid_rows);
 document.documentElement.style.setProperty("--grid-columns", grid_columns);
 
+document.documentElement.style.setProperty("--next-grid-rows", next_grid_rows);
+document.documentElement.style.setProperty("--next-grid-columns", next_grid_columns);
+
+document.documentElement.style.setProperty("--hold-grid-rows", hold_grid_rows);
+document.documentElement.style.setProperty("--hold-grid-columns", hold_grid_columns);
+
 const grid = document.getElementById("grid");
+const next_grid = document.getElementById("next_grid");
+const hold_grid = document.getElementById("hold_grid");
 
 const range = (n) => Array.from({"length": n}, (ignore, k) => k);
 
@@ -28,6 +42,42 @@ const cells = range(grid_rows).map(function () {
     grid.append(row);
     return rows;
 });
+
+const next_cells = range(next_grid_rows).map(function () {
+    const next_row = document.createElement("div");
+    next_row.className = "next_row";
+
+    const next_rows = range(next_grid_columns).map(function () {
+        const next_cell = document.createElement("div");
+        next_cell.className = "next_cell";
+
+        next_row.append(next_cell);
+
+        return next_cell;
+    });
+
+    next_grid.append(next_row);
+    return next_rows;
+});
+
+
+const hold_cells = range(hold_grid_rows).map(function () {
+    const hold_row = document.createElement("div");
+    hold_row.className = "hold_row";
+
+    const hold_rows = range(hold_grid_columns).map(function () {
+        const hold_cell = document.createElement("div");
+        hold_cell.className = "hold_cell";
+
+        hold_row.append(hold_cell);
+
+        return hold_cell;
+    });
+
+    hold_grid.append(hold_row);
+    return hold_rows;
+});
+
 
 const update_grid = function () {
     game.field.forEach(function (line, line_index) {
@@ -49,7 +99,48 @@ const update_grid = function () {
             }
         }
     );
+    update_next_grid();
+    update_hold_grid();
 };
+
+const update_next_grid = function() {
+    next_cells.forEach(function(line, line_index) {
+        line.forEach(function(block, column_index) {
+            const cell = next_cells[line_index][column_index];
+            cell.className = "next_cell";
+        });
+    });
+
+    if (game.next_tetromino) {
+        game.next_tetromino.grid.forEach(function(line, line_index) { // When changed to held_tetromino.grid the game breaks
+            line.forEach(function(block, column_index) {
+                const next_cell = next_cells[line_index + 2][column_index + 1];
+                next_cell.className = `next_cell ${block}`;
+            });
+        });
+    }
+};
+
+const update_hold_grid = function() {
+    hold_cells.forEach(function(line, line_index) {
+        line.forEach(function(block, column_index) {
+            const cell = hold_cells[line_index][column_index];
+            cell.className = "hold_cell";
+        });
+    });
+
+    if (game.hold_tetromino) {
+        game.hold_tetromino.grid.forEach(function(line, line_index) { // When changed to held_tetromino.grid the game breaks
+            line.forEach(function(block, column_index) {
+                const hold_cell = hold_cells[line_index + 2][column_index + 1];
+                hold_cell.className = (
+                    `hold_cell ${block}`
+                );
+            });
+        });
+    }
+};
+
 
 // Don't allow the player to hold down the rotate key.
 let key_locked = false;
@@ -74,6 +165,9 @@ document.body.onkeydown = function (event) {
     }
     if (event.key === " ") {
         game = Tetris.hard_drop(game);
+    }
+    if (event.key === "c") {
+        game = Tetris.hold(game);
     }
     update_grid();
 };
