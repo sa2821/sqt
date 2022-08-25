@@ -3,10 +3,10 @@ import Tetris from "../common/Tetris.js";
 const grid_columns = Tetris.field_width;
 const grid_rows = Tetris.field_height;
 
-const next_grid_rows = 6;
-const next_grid_columns = 6;
-const hold_grid_rows = 6;
-const hold_grid_columns = 6;
+const next_grid_rows = 7;
+const next_grid_columns = 7;
+const hold_grid_rows = 7;
+const hold_grid_columns = 7;
 
 
 let game = Tetris.new_game();
@@ -43,39 +43,39 @@ const cells = range(grid_rows).map(function () {
     return rows;
 });
 
-const next_cells = range(next_grid_rows).map(function () {
-    const next_row = document.createElement("div");
-    next_row.className = "next_row";
+const next_cells = range(7).map(function () {
+    const row = document.createElement("div");
+    row.className = "row";
 
-    const next_rows = range(next_grid_columns).map(function () {
-        const next_cell = document.createElement("div");
-        next_cell.className = "next_cell";
+    const rows = range(6).map(function () {
+        const cell = document.createElement("div");
+        cell.className = "cell";
 
-        next_row.append(next_cell);
+        row.append(cell);
 
-        return next_cell;
+        return cell;
     });
 
-    next_grid.append(next_row);
-    return next_rows;
+    next_grid.append(row);
+    return rows;
 });
 
 
-const hold_cells = range(hold_grid_rows).map(function () {
-    const hold_row = document.createElement("div");
-    hold_row.className = "hold_row";
+const hold_cells = range(7).map(function () {
+    const row = document.createElement("div");
+    row.className = "row";
 
-    const hold_rows = range(hold_grid_columns).map(function () {
-        const hold_cell = document.createElement("div");
-        hold_cell.className = "hold_cell";
+    const rows = range(6).map(function () {
+        const cell = document.createElement("div");
+        cell.className = "cell";
 
-        hold_row.append(hold_cell);
+        row.append(cell);
 
-        return hold_cell;
+        return cell;
     });
 
-    hold_grid.append(hold_row);
-    return hold_rows;
+    hold_grid.append(row);
+    return rows;
 });
 
 
@@ -105,37 +105,35 @@ const update_grid = function () {
 
 const update_next_grid = function() {
     next_cells.forEach(function(line, line_index) {
-        line.forEach(function(block, column_index) {
-            const cell = next_cells[line_index][column_index];
-            cell.className = "next_cell";
+        line.forEach(function(cell, column_index) {
+            //const cell = next_cells[line_index][column_index];
+            cell.className = "cell";
+            cell.backgroundColor = "";
         });
     });
 
-    if (game.next_tetromino) {
-        game.next_tetromino.grid.forEach(function(line, line_index) { // When changed to held_tetromino.grid the game breaks
-            line.forEach(function(block, column_index) {
-                const next_cell = next_cells[line_index + 2][column_index + 1];
-                next_cell.className = `next_cell ${block}`;
-            });
+    game.next_tetromino.grid.forEach(function(line, line_index) { 
+        line.forEach(function(block, column_index) {
+            const cell = next_cells[line_index + 3][column_index + 1];
+            cell.className = "cell " + block;
         });
-    }
+    });
 };
 
 const update_hold_grid = function() {
     hold_cells.forEach(function(line, line_index) {
         line.forEach(function(block, column_index) {
             const cell = hold_cells[line_index][column_index];
-            cell.className = "hold_cell";
+            cell.className = "cell";
+            cell.backgroundColor = "";
         });
     });
 
     if (game.hold_tetromino) {
         game.hold_tetromino.grid.forEach(function(line, line_index) { // When changed to held_tetromino.grid the game breaks
             line.forEach(function(block, column_index) {
-                const hold_cell = hold_cells[line_index + 2][column_index + 1];
-                hold_cell.className = (
-                    `hold_cell ${block}`
-                );
+                const cell = hold_cells[line_index + 3][column_index + 1];
+                cell.className = "cell " + block;
             });
         });
     }
