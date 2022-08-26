@@ -639,11 +639,9 @@ Tetris.hold = function(game) {
         // 2. hold tetromino becomes current tetromino
         // 3. next tetromino becomes next tetromino of next turn
         if (game.hold_tetromino == false) {
-            //const [next_tetromino, bag] = game.bag();
             game.hold_tetromino = game.current_tetromino;
             game.next_tetromino = Tetris.next_turn(game).next_tetromino;
             game.current_tetromino = game.next_tetromino;
-            //game.bag = bag;
             // start from the top again
             game.position = starting_position;
         }
