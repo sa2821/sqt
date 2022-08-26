@@ -3,22 +3,17 @@ import Tetris from "../common/Tetris.js";
 const grid_columns = Tetris.field_width;
 const grid_rows = Tetris.field_height;
 
-const next_grid_rows = 7;
-const next_grid_columns = 7;
-const hold_grid_rows = 7;
-const hold_grid_columns = 7;
-
 
 let game = Tetris.new_game();
 
 document.documentElement.style.setProperty("--grid-rows", grid_rows);
 document.documentElement.style.setProperty("--grid-columns", grid_columns);
 
-document.documentElement.style.setProperty("--next-grid-rows", next_grid_rows);
+/*document.documentElement.style.setProperty("--next-grid-rows", next_grid_rows);
 document.documentElement.style.setProperty("--next-grid-columns", next_grid_columns);
 
 document.documentElement.style.setProperty("--hold-grid-rows", hold_grid_rows);
-document.documentElement.style.setProperty("--hold-grid-columns", hold_grid_columns);
+document.documentElement.style.setProperty("--hold-grid-columns", hold_grid_columns);*/
 
 const grid = document.getElementById("grid");
 const next_grid = document.getElementById("next_grid");
